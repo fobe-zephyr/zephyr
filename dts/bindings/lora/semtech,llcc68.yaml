@@ -1,0 +1,16 @@
+# Copyright (c) 2020 Andreas Sandberg
+# SPDX-License-Identifier: Apache-2.0
+
+description: Semtech LLCC68 LoRa Modem
+
+compatible: "semtech,llcc68"
+
+include: semtech,sx126x-base.yaml
+
+properties:
+  reset-gpios:
+    required: true
+  busy-gpios:
+    required: true
+  dio1-gpios:
+    required: true
