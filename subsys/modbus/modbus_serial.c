@@ -533,13 +533,9 @@ int modbus_serial_init(struct modbus_context *ctx,
 	switch (param.serial.parity) {
 	case UART_CFG_PARITY_ODD:
 	case UART_CFG_PARITY_EVEN:
-		uart_cfg.parity = param.serial.parity;
-		uart_cfg.stop_bits = UART_CFG_STOP_BITS_1;
-		break;
 	case UART_CFG_PARITY_NONE:
-		/* Use of no parity requires 2 stop bits */
 		uart_cfg.parity = param.serial.parity;
-		uart_cfg.stop_bits = UART_CFG_STOP_BITS_2;
+		uart_cfg.stop_bits = param.serial.stop_bits_client;
 		break;
 	default:
 		return -EINVAL;
