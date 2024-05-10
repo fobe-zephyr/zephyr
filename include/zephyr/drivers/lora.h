@@ -177,13 +177,16 @@ typedef int (*lora_api_recv_async)(const struct device *dev, lora_recv_cb cb);
 typedef int (*lora_api_test_cw)(const struct device *dev, uint32_t frequency,
 				int8_t tx_power, uint16_t duration);
 
+typedef int (*lora_api_is_channel_free)(const struct device *dev, int16_t rssi_thresh, uint64_t max_carrier_sense_time);
+
 struct lora_driver_api {
-	lora_api_config config;
-	lora_api_send send;
-	lora_api_send_async send_async;
-	lora_api_recv recv;
-	lora_api_recv_async recv_async;
-	lora_api_test_cw test_cw;
+    lora_api_config config;
+    lora_api_send send;
+    lora_api_send_async send_async;
+    lora_api_recv recv;
+    lora_api_recv_async recv_async;
+    lora_api_test_cw test_cw;
+    lora_api_is_channel_free is_channel_free;
 };
 
 /** @endcond */
@@ -317,6 +320,28 @@ static inline int lora_test_cw(const struct device *dev, uint32_t frequency,
 	}
 
 	return api->test_cw(dev, frequency, tx_power, duration);
+}
+
+/**
+ * @brief Checks if the channel is free for the given time
+ *
+ * @note Only use this functionality in a test setup where the
+ * transmission does not interfere with other devices.
+ *
+ * @param dev                   LoRa device
+ * @param rssiThresh            RSSI threshold in dBm
+ * @param maxCarrierSenseTime   Max time in milliseconds while the RSSI is measured
+ * @return 0 on free, -1 on busy
+ */
+static inline int lora_is_channel_free(const struct device *dev, int16_t rssi_thresh, uint64_t max_carrier_sense_time) {
+    const struct lora_driver_api *api =
+            (const struct lora_driver_api *) dev->api;
+
+    if (api->is_channel_free == NULL) {
+        return -ENOSYS;
+    }
+
+    return api->is_channel_free(dev, rssi_thresh, max_carrier_sense_time);
 }
 
 #ifdef __cplusplus
